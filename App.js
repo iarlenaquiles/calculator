@@ -5,39 +5,84 @@ import Button from './src/components/Button';
 import Display from './src/components/Display';
 
 const App = () => {
-  const [displayValue, setDisplayValue] = useState('100');
+  const [displayValue, setDisplayValue] = useState('0');
+  const [clearDisplay, setClearDisplay] = useState(false);
+  const [operation, setOperation] = useState(null);
+  const [value, setValue] = useState([0, 0]);
+  const [current, setCurrent] = useState(0);
 
   const handleClick = number => {
-    setDisplayValue(number);
+    if (number === '.' && displayValue.includes('.')) {
+      return;
+    }
+
+    const display = displayValue === '0' || clearDisplay;
+    const currentValue = display ? '' : displayValue;
+    const newDisplayValue = currentValue + number;
+    setDisplayValue(newDisplayValue);
+    setClearDisplay(false);
+
+    if (number !== '.') {
+      const newValue = parseFloat(newDisplayValue);
+      const newValueArray = [...value];
+      newValueArray[current] = newValue;
+      setValue(newValueArray);
+    }
   };
 
   const clearMemory = () => {
     setDisplayValue('0');
+    setOperation(null);
+    setClearDisplay(false);
+    setValue([0, 0]);
+    setCurrent(0);
   };
 
-  const setOperation = operation => {};
+  const handleOperation = operation => {
+    if (current === 0) {
+      setCurrent(1);
+      setOperation(operation);
+      setClearDisplay(true);
+    } else {
+      const equals = operation === '=';
+      const values = [...value];
+
+      try {
+        values[0] = eval(`${values[0]} ${operation} ${values[1]}`);
+      } catch (e) {
+        values[0] = value[0];
+      }
+
+      values[1] = 0;
+      setDisplayValue(values[0]);
+      setOperation(equals ? null : operation);
+      setCurrent(equals ? 0 : 1);
+      setClearDisplay(!equals);
+      setValue(values);
+    }
+  };
 
   return (
     <SafeAreaView style={styles.container}>
       <Display value={displayValue} />
       <View style={styles.buttons}>
         <Button label="AC" triple onClick={clearMemory} />
-        <Button label="/" operation onClick={setOperation} />
+        <Button label="/" operation onClick={handleOperation} />
         <Button label="7" onClick={handleClick} />
         <Button label="8" onClick={handleClick} />
         <Button label="9" onClick={handleClick} />
-        <Button label="*" operation onClick={setOperation} />
+        <Button label="*" operation onClick={handleOperation} />
         <Button label="4" onClick={handleClick} />
         <Button label="5" onClick={handleClick} />
         <Button label="6" onClick={handleClick} />
-        <Button label="-" operation onClick={setOperation} />
+        <Button label="-" operation onClick={handleOperation} />
         <Button label="1" onClick={handleClick} />
         <Button label="2" onClick={handleClick} />
         <Button label="3" onClick={handleClick} />
-        <Button label="+" operation onClick={setOperation} />
+        <Button label="+" operation onClick={handleOperation} />
         <Button label="0" double onClick={handleClick} />
         <Button label="." onClick={handleClick} />
-        <Button label="=" operation onClick={setOperation} />
+        <Button label="=" operation onClick={handleOperation} />
       </View>
     </SafeAreaView>
   );
