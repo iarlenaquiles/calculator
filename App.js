@@ -10,13 +10,15 @@ const App = () => {
   const [operation, setOperation] = useState(null);
   const [value, setValue] = useState([0, 0]);
   const [current, setCurrent] = useState(0);
+  const [operationEquals, setOperationEquals] = useState(null);
 
   const handleClick = number => {
-    if (number === '.' && displayValue.includes('.')) {
+    const display = displayValue === '0' || clearDisplay;
+
+    if (number === '.' && !display && displayValue.includes('.')) {
       return;
     }
 
-    const display = displayValue === '0' || clearDisplay;
     const currentValue = display ? '' : displayValue;
     const newDisplayValue = currentValue + number;
     setDisplayValue(newDisplayValue);
@@ -36,6 +38,7 @@ const App = () => {
     setClearDisplay(false);
     setValue([0, 0]);
     setCurrent(0);
+    setOperationEquals(null);
   };
 
   const handleOperation = operation => {
@@ -47,6 +50,8 @@ const App = () => {
       const equals = operation === '=';
       const values = [...value];
 
+      console.debug(values, operation)
+      console.debug(`${values[0]} ${operation} ${values[1]}`)
       try {
         values[0] = eval(`${values[0]} ${operation} ${values[1]}`);
       } catch (e) {
@@ -54,10 +59,10 @@ const App = () => {
       }
 
       values[1] = 0;
-      setDisplayValue(values[0]);
+      setDisplayValue(`${values[0]}`);
       setOperation(equals ? null : operation);
       setCurrent(equals ? 0 : 1);
-      setClearDisplay(!equals);
+      setClearDisplay(true);
       setValue(values);
     }
   };
