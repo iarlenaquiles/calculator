@@ -41,6 +41,15 @@ const App = () => {
     setOperationEquals(null);
   };
 
+  const handleResult = () => {
+    if (current === 1) {
+      const values = [...value];
+      values[0] = eval(`${values[0]} ${operation} ${values[1]}`);
+
+      setDisplayValue(`${values[0]}`);
+    }
+  };
+
   const handleOperation = operation => {
     if (current === 0) {
       setCurrent(1);
@@ -50,8 +59,8 @@ const App = () => {
       const equals = operation === '=';
       const values = [...value];
 
-      console.debug(values, operation)
-      console.debug(`${values[0]} ${operation} ${values[1]}`)
+      console.debug(values, operation);
+      console.debug(`${values[0]} ${operation} ${values[1]}`);
       try {
         values[0] = eval(`${values[0]} ${operation} ${values[1]}`);
       } catch (e) {
@@ -87,7 +96,7 @@ const App = () => {
         <Button label="+" operation onClick={handleOperation} />
         <Button label="0" double onClick={handleClick} />
         <Button label="." onClick={handleClick} />
-        <Button label="=" operation onClick={handleOperation} />
+        <Button label="=" operation onClick={handleResult} />
       </View>
     </SafeAreaView>
   );
